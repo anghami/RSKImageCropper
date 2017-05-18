@@ -463,6 +463,11 @@ static const CGFloat kLandscapeCancelAndChooseButtonsVerticalMargin = 12.0f;
                 length = MIN(viewWidth, viewHeight) - kLandscapeSquareMaskRectInnerEdgeInset * 2;
             }
             
+            CGFloat minDimension = MIN(self.imageScrollView.contentSize.height, self.imageScrollView.contentSize.width);
+            if (minDimension > 0) {
+                length = MIN(length, minDimension);
+            }
+            
             CGSize maskSize = CGSizeMake(length, length);
             
             self.maskRect = CGRectMake((viewWidth - maskSize.width) * 0.5f,
@@ -511,8 +516,15 @@ static const CGFloat kLandscapeCancelAndChooseButtonsVerticalMargin = 12.0f;
     
     cropRect.origin.x = round(self.imageScrollView.contentOffset.x * zoomScale);
     cropRect.origin.y = round(self.imageScrollView.contentOffset.y * zoomScale);
-    cropRect.size.width = CGRectGetWidth(self.imageScrollView.bounds) * zoomScale;
-    cropRect.size.height = CGRectGetHeight(self.imageScrollView.bounds) * zoomScale;
+    CGFloat width = CGRectGetWidth(self.imageScrollView.bounds) * zoomScale;
+    CGFloat height = CGRectGetHeight(self.imageScrollView.bounds) * zoomScale;
+    if(self.cropMode == RSKImageCropModeSquare) {
+        cropRect.size.width = MIN(width, height);
+        cropRect.size.height = MIN(width, height);
+    } else {
+        cropRect.size.width = width;
+        cropRect.size.height = height;
+    }
     
     cropRect = CGRectIntegral(cropRect);
     
