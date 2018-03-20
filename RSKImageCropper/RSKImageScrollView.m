@@ -178,6 +178,11 @@
 
 - (void)configureForImageSize:(CGSize)imageSize
 {
+    if(imageSize.width > imageSize.height) {
+        imageSize = CGSizeMake(imageSize.height, imageSize.height);
+    } else {
+        imageSize = CGSizeMake(imageSize.width, imageSize.width);
+    }
     _imageSize = imageSize;
     self.contentSize = imageSize;
     [self setMaxMinZoomScalesForCurrentBounds];
