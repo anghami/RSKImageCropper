@@ -509,15 +509,15 @@ static const CGFloat kLandscapeCancelAndChooseButtonsVerticalMargin = 12.0f;
     }
 }
 
-- (CGRect)cropRect
+- (CGRect)cropRectWithScrollViewScale:(CGFloat)scale contentOffset:(CGPoint)contentOffset bounds:(CGRect)bounds
 {
     CGRect cropRect = CGRectZero;
-    float zoomScale = 1.0 / self.imageScrollView.zoomScale;
+    float zoomScale = 1.0 / scale;
     
-    cropRect.origin.x = round(self.imageScrollView.contentOffset.x * zoomScale);
-    cropRect.origin.y = round(self.imageScrollView.contentOffset.y * zoomScale);
-    CGFloat width = CGRectGetWidth(self.imageScrollView.bounds) * zoomScale;
-    CGFloat height = CGRectGetHeight(self.imageScrollView.bounds) * zoomScale;
+    cropRect.origin.x = round(contentOffset.x * zoomScale);
+    cropRect.origin.y = round(contentOffset.y * zoomScale);
+    CGFloat width = CGRectGetWidth(bounds) * zoomScale;
+    CGFloat height = CGRectGetHeight(bounds) * zoomScale;
     if(self.cropMode == RSKImageCropModeSquare) {
         cropRect.size.width = MIN(width, height);
         cropRect.size.height = MIN(width, height);
@@ -614,8 +614,11 @@ static const CGFloat kLandscapeCancelAndChooseButtonsVerticalMargin = 12.0f;
     if ([self.delegate respondsToSelector:@selector(imageCropViewController:willCropImage:)]) {
         [self.delegate imageCropViewController:self willCropImage:self.originalImage];
     }
+    CGFloat scale = self.imageScrollView.zoomScale;
+    CGPoint contentOffset = self.imageScrollView.contentOffset;
+    CGRect bounds = self.imageScrollView.bounds;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        CGRect cropRect = [self cropRect];
+        CGRect cropRect = [self cropRectWithScrollViewScale:scale contentOffset:contentOffset bounds:bounds];
         UIImage *croppedImage = [self croppedImage:self.originalImage cropRect:cropRect];
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self.delegate respondsToSelector:@selector(imageCropViewController:didCropImage:usingCropRect:)]) {
